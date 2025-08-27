@@ -49,7 +49,24 @@ sudo -u postgres /usr/lib/postgresql/17/bin/pg_upgrade   -b /usr/lib/postgresql/
 ## ⚡ 5. Actual Upgrade
 
 ```bash
-sudo -u postgres /usr/lib/postgresql/17/bin/pg_upgrade   -b /usr/lib/postgresql/14/bin   -B /usr/lib/postgresql/17/bin   -d /var/lib/postgresql/14/main   -D /var/lib/postgresql/17/main   -j "$(nproc)"   --link
+sudo -u postgres /usr/lib/postgresql/17/bin/pg_upgrade \
+  -b /usr/lib/postgresql/14/bin \
+  -B /usr/lib/postgresql/17/bin \
+  -d /var/lib/postgresql/14/main \
+  -D /var/lib/postgresql/17/main \
+  -o "-c config_file=/etc/postgresql/14/main/postgresql.conf \
+      -c hba_file=/etc/postgresql/14/main/pg_hba.conf \
+      -c ident_file=/etc/postgresql/14/main/pg_ident.conf \
+      -c shared_preload_libraries=''" \
+  -O "-c config_file=/etc/postgresql/17/main/postgresql.conf \
+      -c hba_file=/etc/postgresql/17/main/pg_hba.conf \
+      -c ident_file=/etc/postgresql/17/main/pg_ident.conf \
+      -c shared_preload_libraries='timescaledb' \
+      -c unix_socket_permissions=0700 \
+      -c unix_socket_directories='/tmp'" \
+  -j "$(nproc)" \
+  --link
+
 ```
 
 ---
